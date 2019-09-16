@@ -1,36 +1,27 @@
 /* eslint-disable no-unused-vars */
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+// useEffect = hook. Allows to run code 1 time
 import {View, Text, StyleSheet} from 'react-native';
 import SearchBar from '../components/SearchBar';
-import yelp from '../api/yelp';
-
+import useResults from '../hooks/useResults';
+import ResultsList from '../components/ResultsList';
 
 const SearchScreen = () => {
     const [term, setTerm] = useState('');
-    const [results, setResults] = useState([]);
-
-    const searchApi = async () => {
-        const response = await yelp.get('/search', {
-            params: {
-                limit:50,
-                term, // term: term
-                location: 'san jose'
-            }
-        });
-        setResults(response.data.businesses);
-
-        // promise needed for async call .then()
-    };
+    const [searchApi, results, errorMessage] = useResults();
 
     return (
         <View>
             <SearchBar 
                 term={term} 
                 onTermChange={setTerm} // or newTerm => setTerm(newTerm)
-                onTermSubmit={searchApi} // or () => searchApi() passin the reference to the funciton invoked
+                onTermSubmit={() => searchApi(term)} // or () => searchApi() passin the reference to the funciton invoked
             />
-            <Text>Search Screen</Text>
+            {errorMessage ? <Text>{errorMessage}</Text> : null}
             <Text>We have found {results.length}</Text>
+            <ResultsList title="Cost Effective" />
+            <ResultsList title="Bit Pricier" />
+            <ResultsList title="Big Spender" />
         </View>
     );
 
